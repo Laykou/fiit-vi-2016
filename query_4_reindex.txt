@@ -1,0 +1,97 @@
+PUT /new_questions
+{
+   "settings": {
+      "analysis": {
+         "char_filter": {
+            "&_to_and": {
+               "type": "mapping",
+               "mappings": [
+                  "&=> and "
+               ]
+            }
+         },
+         "filter": {
+            "custom_stopwords": {
+               "type": "stop",
+               "stopwords": [
+                  "the",
+                  "a",
+                  "an",
+                  "uhm",
+                  "ah",
+                  "heh",
+                  "hey"
+               ]
+            }
+         },
+         "tokenizer": {
+            "custom_tokenizer": {
+               "type": "standard",
+               "max_token_length": "10"
+            }
+         },
+         "analyzer": {
+            "vi_analyzer": {
+               "type": "custom",
+               "char_filter": [
+                  "html_strip",
+                  "&_to_and"
+               ],
+               "tokenizer": "custom_tokenizer",
+               "filter": [
+                  "lowercase",
+                  "custom_stopwords"
+               ]
+            }
+         }
+      }
+   },
+   "mappings": {
+      "question": {
+         "properties": {
+            "title": {
+               "type": "string",
+               "analyzer": "vi_analyzer"
+            },
+            "question": {
+               "type": "string",
+               "analyzer": "vi_analyzer"
+            },
+            "votes": {
+               "type": "integer"
+            },
+            "favorites": {
+               "type": "integer"
+            },
+            "owner": {
+               "properties": {
+                  "username": {
+                     "type": "string"
+                  },
+                  "reputation": {
+                     "type": "integer"
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+POST /_reindex
+{
+   "source": {
+      "index": "questions",
+      "query": {
+          "match": {
+             "tags": "python"
+          }
+      }
+   },
+   "dest": {
+      "index": "new_questions"
+   },
+   "script": {
+      "inline": "ctx._source.remove(\"owner.gold\"); ctx._source.remove(\"owner.silver\"); ctx._source.remove(\"owner.bronze\");"
+   }
+}

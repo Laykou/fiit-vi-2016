@@ -1,0 +1,37 @@
+GET /questions/_search
+{
+   "filter": {
+      "script": {
+         "script": "_source.comments.size() <= 3"
+      }
+   },
+   "query": {
+      "function_score": {
+         "query": {
+            "bool": {
+               "must": [
+                  {
+                     "match": {
+                        "answers.question": "elasticsearch"
+                     }
+                  },
+                  {
+                     "range": {
+                        "votes": {
+                           "from": 10
+                        }
+                     }
+                  }
+               ]
+            }
+         },
+         "functions": [
+            {
+               "script_score": {
+                  "script": "return _source.answers.size() * 10 + _source.votes;"
+               }
+            }
+         ]
+      }
+   }
+}

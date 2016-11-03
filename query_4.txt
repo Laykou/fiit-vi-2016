@@ -1,0 +1,55 @@
+POST /new_questions/_search
+{
+   "query": {
+       "bool": {
+         "filter": [
+            {
+               "range": {
+                  "votes": {
+                     "from": 1
+                  }
+               }
+            }
+         ],
+         "must": [
+            {
+               "match": {
+                  "title": "error database"
+               }
+            }
+         ],
+         "should": [
+            {
+               "match": {
+                  "question": "sqlite"
+               }
+            },
+            {
+               "term": {
+                  "tags": "mysql"
+               }
+            }
+         ],
+         "minimum_should_match": 1
+      }
+   },
+   "aggregations": {
+      "top_tags": {
+         "terms": {
+            "field": "tags"
+         },
+         "aggregations": {
+            "votes_stats": {
+               "stats": {
+                  "field": "votes"
+               }
+            },
+            "favorites_stats": {
+               "stats": {
+                  "field": "favorites"
+               }
+            }
+         }
+      }
+   }
+}

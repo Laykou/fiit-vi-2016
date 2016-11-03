@@ -1,0 +1,14 @@
+GET /new_questions/_search
+{
+   "query": {
+      "query_string": {
+         "fields": [
+            "title",
+            "question",
+            "answers.question"
+         ],
+         "query": "parse? AND (web OR *tml)",
+         "allow_leading_wildcard": true
+      }
+   }
+}

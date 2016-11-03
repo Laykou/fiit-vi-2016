@@ -1,0 +1,53 @@
+GET /questions/_search
+{
+   "query": {
+      "bool": {
+         "filter": [
+            {
+               "term": {
+                  "tags": "php"
+               }
+            },
+            {
+               "range": {
+                  "votes": {
+                     "from": 1
+                  }
+               }
+            }
+         ],
+         "must": [
+            {
+               "match": {
+                  "title": "connect"
+               }
+            }
+         ],
+         "must_not": [
+            {
+               "match": {
+                  "title": "mysql"
+               }
+            },
+            {
+               "match": {
+                  "title": "facebook"
+               }
+            }
+         ],
+         "should": [
+            {
+               "match": {
+                  "question": "database localhost"
+               }
+            },
+            {
+               "term": {
+                  "tags": "cakephp"
+               }
+            }
+         ],
+         "minimum_should_match": 1
+      }
+   }
+}
